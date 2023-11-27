@@ -13,66 +13,93 @@ This library is also compatible with the Android platform and can be used withou
 ## Usage
 
 ```java
-// Create a new TusClient instance
-TusClient client = new TusClient();
+package io.tus.java.client;
 
-// Configure tus HTTP endpoint. This URL will be used for creating new uploads
-// using the Creation extension
-client.setUploadCreationURL(new URL("https://tusd.tusdemo.net/files"));
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
-// Enable resumable uploads by storing the upload URL in memory
-client.enableResuming(new TusURLMemoryStore());
 
-// Open a file using which we will then create a TusUpload. If you do not have
-// a File object, you can manually construct a TusUpload using an InputStream.
-// See the documentation for more information.
-File file = new File("./cute_kitten.png");
-final TusUpload upload = new TusUpload(file);
 
-System.out.println("Starting upload...");
+public class SunatTusClientMain {
+    public static void main(String[] args){
+        try {
+            SslUtil.setSSLContext();
+            final TusClient client = new TusClient();
+            String HOST_PUBLICA = "https://api-sire.sunat.gob.pe/v1/contribuyente/migeigv/";
+            String END_POINT_PROPUESTA = "libros/rvierce/receptorpreliminar/web/preliminar/upload";
+            System.setProperty("http.strictPostRedirect", "true");
+            client.setUploadCreationURL(new URL(HOST_PUBLICA + END_POINT_PROPUESTA));
+            client.enableResuming(new TusURLMemoryStore());
+            Map<String, String> headers = new HashMap<>();
+            String tokenSunat="eyJraWQiOiJhcGkuc3VuYXQuZ29iLnBlLmtpZDAwMSIsInR5cCI6IkpXVCIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIyMDU2MzQ3MjY3OCIsImF1ZCI6Ilt7XCJhcGlcIjpcImh0dHBzOlwvXC9hcGktY3BlLnN1bmF0LmdvYi5wZVwiLFwicmVjdXJzb1wiOlt7XCJpZFwiOlwiXC92MVwvY29udHJpYnV5ZW50ZVwvcmVwb3ZlbnRhc1wiLFwiaW5kaWNhZG9yXCI6XCIxXCIsXCJndFwiOlwiMTAwMTAwXCJ9XX0se1wiYXBpXCI6XCJodHRwczpcL1wvYXBpLXNpcmUuc3VuYXQuZ29iLnBlXCIsXCJyZWN1cnNvXCI6W3tcImlkXCI6XCJcL3YxXC9jb250cmlidXllbnRlXC9taWdlaWd2XCIsXCJpbmRpY2Fkb3JcIjpcIjFcIixcImd0XCI6XCIxMDAxMDBcIn1dfV0iLCJ1c2VyZGF0YSI6eyJudW1SVUMiOiIyMDU2MzQ3MjY3OCIsInRpY2tldCI6IjExODUxMDM2MjQ3NzgiLCJucm9SZWdpc3RybyI6IiIsImFwZU1hdGVybm8iOiIiLCJsb2dpbiI6IjIwNTYzNDcyNjc4TU9EREFUT1MiLCJub21icmVDb21wbGV0byI6IkZFUEFNIElNUE9SVCBTLkEuQy4iLCJub21icmVzIjoiRkVQQU0gSU1QT1JUIFMuQS5DLiIsImNvZERlcGVuZCI6IjAwMjMiLCJjb2RUT3BlQ29tZXIiOiIiLCJjb2RDYXRlIjoiIiwibml2ZWxVTyI6MCwiY29kVU8iOiIiLCJjb3JyZW8iOiIiLCJ1c3VhcmlvU09MIjoiTU9EREFUT1MiLCJpZCI6IiIsImRlc1VPIjoiIiwiZGVzQ2F0ZSI6IiIsImFwZVBhdGVybm8iOiIiLCJpZENlbHVsYXIiOm51bGwsIm1hcCI6eyJpc0Nsb24iOmZhbHNlLCJkZHBEYXRhIjp7ImRkcF9udW1ydWMiOiIyMDU2MzQ3MjY3OCIsImRkcF9udW1yZWciOiIwMDIzIiwiZGRwX2VzdGFkbyI6IjAwIiwiZGRwX2ZsYWcyMiI6IjAwIiwiZGRwX3ViaWdlbyI6IjE1MDEzMiIsImRkcF90YW1hbm8iOiIwMyIsImRkcF90cG9lbXAiOiIzOSIsImRkcF9jaWl1IjoiNTE5MDYifSwiaWRNZW51IjoiMTE4NTEwMzYyNDc3OCIsImpuZGlQb29sIjoicDAwMjMiLCJ0aXBVc3VhcmlvIjoiMCIsInRpcE9yaWdlbiI6IklUIiwicHJpbWVyQWNjZXNvIjpmYWxzZX19LCJuYmYiOjE2ODg0ODQ5OTIsImNsaWVudElkIjoiYzgxMmE2YmUtOWRiMS00Mjc5LWE2ZjUtZTYzZTgxZWM2NGExIiwiaXNzIjoiaHR0cHM6XC9cL2FwaS1zZWd1cmlkYWQuc3VuYXQuZ29iLnBlXC92MVwvY2xpZW50ZXNzb2xcL2M4MTJhNmJlLTlkYjEtNDI3OS1hNmY1LWU2M2U4MWVjNjRhMVwvb2F1dGgyXC90b2tlblwvIiwiZXhwIjoxNjg4NDg4NTkyLCJncmFudFR5cGUiOiJhdXRob3JpemF0aW9uX3Rva2VuIiwiaWF0IjoxNjg4NDg0OTkyfQ.YJOCKJXV84IYHvDsEWgP2AZ_fnbpj0AIubyri_tFxKu13Eko_W9rC6zvS3tTI3vkqiw2CZRQ9wZ6MEjN36ulUPvPAGgSNpz85yj3fTjuheZ0amAn5dKSE-8dGa9cwLxXPPNVOq-8hr71gNFt5ieoCxmGvifQO766EyLPuTr2_RsFTxwJKuSRycrjfv1S-ydPxl7NJyj3BKD8BNqMCblGyb2eJnsyZRqbrAgsy6pbXl_4mi6Bon71grFymFuwy_9pn17C_TzcisZ_Zp66ow6ou4uWJ7UH99dC7ZmwQTEMey3RNw8lpolDNYptaJ_DOFwD9PQuduWqNq7bIUL6NeGJjA";
+            headers.put("authorization", "Bearer " + tokenSunat);
 
-// We wrap our uploading code in the TusExecutor class which will automatically catch
-// exceptions and issue retries with small delays between them and take fully
-// advantage of tus' resumability to offer more reliability.
-// This step is optional but highly recommended.
-TusExecutor executor = new TusExecutor() {
-    @Override
-    protected void makeAttempt() throws ProtocolException, IOException {
-        // First try to resume an upload. If that's not possible we will create a new
-        // upload and get a TusUploader in return. This class is responsible for opening
-        // a connection to the remote server and doing the uploading.
-        TusUploader uploader = client.resumeOrCreateUpload(upload);
-        
-        // Alternatively, if your tus server does not support the Creation extension
-        // and you obtained an upload URL from another service, you can instruct
-        // tus-java-client to upload to a specific URL. Please note that this is usually
-        // _not_ necessary and only if the tus server does not support the Creation
-        // extension. The Vimeo API would be an example where this method is needed.
-        // TusUploader uploader = client.beginOrResumeUploadFromURL(upload, new URL("https://tus.server.net/files/my_file"));
-
-        // Upload the file in chunks of 1KB sizes.
-        uploader.setChunkSize(1024);
-
-        // Upload the file as long as data is available. Once the
-        // file has been fully uploaded the method will return -1
-        do {
-            // Calculate the progress using the total size of the uploading file and
-            // the current offset.
-            long totalBytes = upload.getSize();
-            long bytesUploaded = uploader.getOffset();
-            double progress = (double) bytesUploaded / totalBytes * 100;
-
-            System.out.printf("Upload at %06.2f%%.\n", progress);
-        } while(uploader.uploadChunk() > -1);
-
-        // Allow the HTTP connection to be closed and cleaned up
-        uploader.finish();
-
-        System.out.println("Upload finished.");
-        System.out.format("Upload available at: %s", uploader.getUploadURL().toString());
+            client.setHeaders(headers);
+            File archive = new File("D:\\LE2046753402620230600080500001112.zip");
+            final TusUpload upload = new TusUpload(archive);
+            String[] extension = archive.getName().split("\\.");
+            Map<String, String> metaData = new HashMap<>();
+            metaData.put("filename", archive.getName());
+            metaData.put("filetype", extension[1]);
+            metaData.put("numRuc","20467534026");
+            metaData.put("perTributario", "202304");
+            metaData.put("codOrigenEnvio", "2");
+            metaData.put("codLibro", "140000");
+            metaData.put("codProceso", "3");
+            metaData.put("codTipoCorrelativo", "01");
+            metaData.put("nomArchivoImportacion", archive.getName());
+            upload.setMetadata(metaData);
+            System.out.println("Starting upload...");
+            TusExecutor executor = new TusExecutor() {
+                @Override
+                protected void makeAttempt() throws ProtocolException,
+                        IOException {
+                    TusUploader uploader = client.resumeOrCreateUpload(upload);
+                    uploader.setChunkSize(1024);
+                    do {
+                        long totalBytes = upload.getSize();
+                        long bytesUploaded = uploader.getOffset();
+                        double progress = (double) bytesUploaded / totalBytes * 100;
+                        System.out.printf("Upload at %06.2f%%.\n", progress);
+                    } while(uploader.uploadChunk() > -1);
+                    HttpURLConnection conection = uploader.getConnection();
+                    System.out.println("code : " + conection.getResponseCode());
+                    System.out.println("method : " + conection.getRequestMethod());
+                    System.out.println("msg : " + conection.getResponseMessage());
+                    String responseBody = "";
+                    ByteArrayOutputStream result = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[1024];
+                    int length;
+                    while ((length = conection.getInputStream().read(buffer))
+                            != -1) {
+                        result.write(buffer, 0, length);
+                    }
+                    responseBody = result.toString("UTF-8");
+                    System.out.println("response : " + responseBody);
+                    uploader.finish();
+                    System.out.println("Upload finished.");
+                    System.out.format("Upload available at: %s", uploader.getUploadURL().toString());
+                    System.out.println("responseBody:"+responseBody);
+                }
+            };
+            executor.makeAttempts();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception ex){
+            System.out.println("---------------------------");
+            System.out.println("Response:");
+            System.out.println("ex.getCause(): "+ex.getMessage());
+            System.out.println("---------------------------");
+            ex.printStackTrace();
+        }
     }
-};
-executor.makeAttempts();
+
+}
 
 ```
 
